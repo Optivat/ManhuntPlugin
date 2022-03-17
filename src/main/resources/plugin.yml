@@ -1,0 +1,6 @@
+name: Manhunt
+version: '${project.version}'
+main: com.optivat.manhunt.Manhunt
+api-version: 1.18
+authors: [ Optivat ]
+description: A speedrunner(s) has to beat the game while hunter(s) have to kill them.
