@@ -81,7 +81,7 @@ public class HunterCompass implements Listener {
                         p.sendMessage(ChatColor.RED + "The speedrunner is in a different dimension");
                     } else {
                         //Setting the compass to point towards the player
-                        if((cooldown.get(p) + 5) >= (System.currentTimeMillis() / 1000)){
+                        if((cooldown.get(p) + main.getConfig().getInt("compass_cooldown")) >= (System.currentTimeMillis() / 1000)){
                             compassMeta.setLodestoneTracked(false);
                             compassMeta.setLodestone(main.speedrunners.get(main.speedrunners.keySet().toArray()[main.compassSelection.get(p)]));
                             compass.setItemMeta(compassMeta);
