@@ -9,3 +9,6 @@ commands:
     description: Used to add or remove speedrunners.
     permission: manhunt.speedrunner
     aliases: [runner, speedrunners]
+  manhunt:
+    description: Used to start or stop the manhunt.
+    permission: manhunt.manhunt

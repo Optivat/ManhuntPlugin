@@ -1,0 +1,6 @@
+#How long it takes for the manhunt to start
+manhunt_start_countdown: 10
+#The delay between each track of the Hunter's Compass (in seconds)
+compass_cooldown_time: 2
+#DO NOT TOUCH number_worlds
+number_worlds: 0

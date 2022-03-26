@@ -1,28 +1,28 @@
 package com.optivat.manhunt;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
 
-import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 public class HunterCompass implements Listener {
 
+
     Manhunt main;
-    HashMap<Player, Long> cooldown = new HashMap<>();
     public HunterCompass(Manhunt main) {
         this.main = main;
     }
 
+    private Cache<Player, Long> cooldown = CacheBuilder.newBuilder().expireAfterWrite(main.getConfig().getInt("compass_cooldown_time"), TimeUnit.SECONDS).build();
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         /*When someone who hasn't been assigned speedrunner or hunter (basically joining the server for the first time while it is running
@@ -41,15 +41,25 @@ public class HunterCompass implements Listener {
         }
     }
 
-
     @EventHandler
-    public void onMove(PlayerMoveEvent e) {
+    public void onLeave(PlayerQuitEvent e) {
         Player p = e.getPlayer();
-        //Gets speedrunner's location
-        if(main.speedrunners.containsKey(p)) {
-            main.speedrunners.replace(p, p.getLocation());
+        if (main.compassSelection.containsKey(p)) {
+            main.compassSelection.remove(p);
+        } else if(main.speedrunners.containsKey(p)) {
+            main.speedrunners.remove(p);
         }
     }
+    @EventHandler
+    public void onMove(PlayerMoveEvent e) {
+        if(main.speedrunners.containsKey(e.getPlayer())) {
+            main.speedrunners.replace(e.getPlayer(), e.getPlayer().getLocation());
+        }
+        if(!(main.speedrunners.containsKey(e.getPlayer()) && main.compassSelection.containsKey(e.getPlayer()))) {
+            main.compassSelection.put(e.getPlayer(), 0);
+        }
+    }
+
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
         Player p = e.getPlayer();
@@ -63,33 +73,35 @@ public class HunterCompass implements Listener {
                 if (main.compassSelection.isEmpty()) {
                     p.sendMessage(ChatColor.RED + "There are no hunters!");
                 } else {
-                    if (main.compassSelection.get(p) == main.speedrunners.size()) {
+                    if (main.compassSelection.get(p) == main.speedrunners.size()-1) {
                         main.compassSelection.replace(p, 0);
                     } else {
                         main.compassSelection.replace(p, main.compassSelection.get(p) + 1);
                     }
-                    p.sendMessage(ChatColor.GOLD + "You are now tracking " + main.speedrunners.keySet().toArray()[main.compassSelection.get(p)]);
+                    p.sendMessage(ChatColor.GOLD + "You are now tracking " + ((Player)main.speedrunners.keySet().toArray()[main.compassSelection.get(p)]).getName() + "!");
                 }
             }
             if (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-                Player speedrunnerSelection = (Player) main.speedrunners.keySet().toArray()[main.compassSelection.get(p)];
                 if (main.speedrunners.isEmpty()) {
                     p.sendMessage(ChatColor.RED + "There are no speedrunners for you to track.");
                 } else {
-                    //Testing to see if the speedrunner is in a different plane of existence (aka the nether or the end)
-                    if(p.getWorld().getEnvironment() != speedrunnerSelection.getWorld().getEnvironment()) {
-                        p.sendMessage(ChatColor.RED + "The speedrunner is in a different dimension");
-                    } else {
-                        //Setting the compass to point towards the player
-                        if((cooldown.get(p) + main.getConfig().getInt("compass_cooldown")) >= (System.currentTimeMillis() / 1000)){
+                    Player speedrunner = (Player) main.speedrunners.keySet().toArray()[main.compassSelection.get(p)];
+                    //A cooldown
+                    if(!cooldown.asMap().containsKey(p)) {
+                        cooldown.put(p, System.currentTimeMillis() + (main.getConfig().getInt("compass_cooldown_time")*1000));
+                        //Testing to see if the speedrunner is in a different plane of existence (aka the nether or the end)
+                        if(p.getWorld().getEnvironment() != speedrunner.getWorld().getEnvironment()) {
+                            p.sendMessage(ChatColor.RED + "The speedrunner is in a different dimension");
+                        } else {
+                            //Setting the compass to point towards the player
                             compassMeta.setLodestoneTracked(false);
                             compassMeta.setLodestone(main.speedrunners.get(main.speedrunners.keySet().toArray()[main.compassSelection.get(p)]));
                             compass.setItemMeta(compassMeta);
-                            p.sendMessage(ChatColor.GREEN + "You've tracked the speedrunner!");
-                            cooldown.put(p, (System.currentTimeMillis() / 1000));
-                        } else {
-                            p.sendMessage(ChatColor.RED + "There is a " + ((System.currentTimeMillis()-cooldown.get(p))/1000) + "cooldown before you can track!");
+                            p.sendMessage(ChatColor.GREEN + "You've tracked " + speedrunner.getName() + "!");
                         }
+                    } else {
+                        long distance = cooldown.asMap().get(p) - System.currentTimeMillis();
+                        p.sendMessage(ChatColor.RED + "You must wait " + TimeUnit.MILLISECONDS.toSeconds(distance) + "before you can track " + speedrunner.getName() + " again.");
                     }
                 }
             }
