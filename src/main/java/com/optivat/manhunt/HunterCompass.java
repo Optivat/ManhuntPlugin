@@ -16,13 +16,15 @@ import java.util.concurrent.TimeUnit;
 
 public class HunterCompass implements Listener {
 
-
+    private Cache<Player, Long> cooldown;
+    private int compassCooldown;
     Manhunt main;
     public HunterCompass(Manhunt main) {
         this.main = main;
+        cooldown = CacheBuilder.newBuilder().expireAfterWrite(main.getConfig().getInt("compass_cooldown_time"), TimeUnit.SECONDS).build();
+        compassCooldown = main.getConfig().getInt("compass_cooldown_time");
     }
 
-    private Cache<Player, Long> cooldown = CacheBuilder.newBuilder().expireAfterWrite(main.getConfig().getInt("compass_cooldown_time"), TimeUnit.SECONDS).build();
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         /*When someone who hasn't been assigned speedrunner or hunter (basically joining the server for the first time while it is running
@@ -36,7 +38,7 @@ public class HunterCompass implements Listener {
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
         //On hunter's death give the hunter a brand-new tracking compass
-        if(main.compassSelection.containsKey(e.getPlayer())) {
+        if(!(main.speedrunners.containsKey(e.getPlayer()))) {
             giveHunterCompass(e.getPlayer());
         }
     }
@@ -88,7 +90,7 @@ public class HunterCompass implements Listener {
                     Player speedrunner = (Player) main.speedrunners.keySet().toArray()[main.compassSelection.get(p)];
                     //A cooldown
                     if(!cooldown.asMap().containsKey(p)) {
-                        cooldown.put(p, System.currentTimeMillis() + (main.getConfig().getInt("compass_cooldown_time")*1000));
+                        cooldown.put(p, System.currentTimeMillis() + (compassCooldown*1000));
                         //Testing to see if the speedrunner is in a different plane of existence (aka the nether or the end)
                         if(p.getWorld().getEnvironment() != speedrunner.getWorld().getEnvironment()) {
                             p.sendMessage(ChatColor.RED + "The speedrunner is in a different dimension");
@@ -101,7 +103,7 @@ public class HunterCompass implements Listener {
                         }
                     } else {
                         long distance = cooldown.asMap().get(p) - System.currentTimeMillis();
-                        p.sendMessage(ChatColor.RED + "You must wait " + TimeUnit.MILLISECONDS.toSeconds(distance) + "before you can track " + speedrunner.getName() + " again.");
+                        p.sendMessage(ChatColor.RED + "You must wait " + TimeUnit.MILLISECONDS.toSeconds(distance) + " seconds before you can track " + speedrunner.getName() + " again.");
                     }
                 }
             }

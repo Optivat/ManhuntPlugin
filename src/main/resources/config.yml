@@ -4,3 +4,5 @@ manhunt_start_countdown: 10
 compass_cooldown_time: 2
 #DO NOT TOUCH number_worlds
 number_worlds: 0
+#The percent chance of getting enderpearls from piglins
+piglin_enderpearl_chance: 50

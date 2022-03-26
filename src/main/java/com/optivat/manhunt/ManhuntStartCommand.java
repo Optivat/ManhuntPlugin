@@ -9,9 +9,13 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 public class ManhuntStartCommand implements CommandExecutor {
     Manhunt main;
-    public ManhuntStartCommand(Manhunt manhunt) {this.main = manhunt;}
+    int timer;
+    int timerTime;
+    public ManhuntStartCommand(Manhunt manhunt) {
+        this.main = manhunt;
+        timerTime = main.getConfig().getInt("manhunt_start_countdown");
+    }
 
-    int timer = main.getConfig().getInt("manhunt_start_countdown");
     int taskID;
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -23,6 +27,7 @@ public class ManhuntStartCommand implements CommandExecutor {
                 if (args.length == 1) {
                     switch (args[0]) {
                         case "start":
+                            timer = timerTime;
                             p.sendMessage(ChatColor.GREEN + "Starting...");
                             BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                             taskID = scheduler.scheduleSyncRepeatingTask(main, () -> {
