@@ -12,3 +12,5 @@ commands:
   manhunt:
     description: Used to start or stop the manhunt.
     permission: manhunt.manhunt
+  teamchattoggle:
+    description: Used to toggle from talking to everyone and to your teammates.

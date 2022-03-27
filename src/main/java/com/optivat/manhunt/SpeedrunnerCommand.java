@@ -46,20 +46,23 @@ public boolean onCommand(CommandSender sender, Command command, String label, St
                     }
                     break;
                 default:
+                    p.sendMessage(ChatColor.DARK_RED + "Usage Error: /speedrunner [add/remove] [player] " + ChatColor.BOLD + "OR " + ChatColor.RESET + ChatColor.DARK_RED + "/speedrunner randomize");
                     return false;
             }
-        } else if(args[0] == "randomize") {
-            Random random = new Random();
-            Player randomPlayer = (Player) Bukkit.getOnlinePlayers().toArray()[random.nextInt(Bukkit.getOnlinePlayers().size())];
-            main.speedrunners.put(randomPlayer, randomPlayer.getLocation());
-            Bukkit.broadcastMessage(ChatColor.GREEN + randomPlayer.getName() + " is now a speedrunner!");
-            //Removing the compass since they are no longer a hunter
-            main.compassSelection.remove(randomPlayer);
-            if(randomPlayer.getInventory().contains(Material.COMPASS)) {
-                randomPlayer.getInventory().remove(Material.COMPASS);
-            }
         } else {
-            p.sendMessage(ChatColor.DARK_RED + "Usage Error: /speedrunner [add/remove] [player] " + ChatColor.BOLD + "OR " + ChatColor.RESET + ChatColor.DARK_RED + "/speedrunner randomize");
+            if(args[1] == "randomize") {
+                Random random = new Random();
+                Player randomPlayer = (Player) Bukkit.getOnlinePlayers().toArray()[random.nextInt(Bukkit.getOnlinePlayers().size())];
+                main.speedrunners.put(randomPlayer, randomPlayer.getLocation());
+                Bukkit.broadcastMessage(ChatColor.GREEN + randomPlayer.getName() + " is now a speedrunner!");
+                //Removing the compass since they are no longer a hunter
+                main.compassSelection.remove(randomPlayer);
+                if(randomPlayer.getInventory().contains(Material.COMPASS)) {
+                    randomPlayer.getInventory().remove(Material.COMPASS);
+                }
+            } else {
+                p.sendMessage(ChatColor.DARK_RED + "Usage Error: /speedrunner [add/remove] [player] " + ChatColor.BOLD + "OR " + ChatColor.RESET + ChatColor.DARK_RED + "/speedrunner randomize");
+            }
         }
     }
     return false;

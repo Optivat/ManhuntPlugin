@@ -2,8 +2,7 @@ package com.optivat.manhunt;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -41,6 +40,20 @@ public class HunterCompass implements Listener {
         if(!(main.speedrunners.containsKey(e.getPlayer()))) {
             giveHunterCompass(e.getPlayer());
         }
+        //Because they are in the manhunt world, if they respawn
+        Player p = e.getPlayer();
+        if (p.getBedSpawnLocation() == null) {
+            Server server = p.getServer();
+            World world = server.getWorld("Manhunt" + main.worldnumber);
+            Location spawn = world.getSpawnLocation();
+            double x = spawn.getX();
+            double y = spawn.getY();
+            double z = spawn.getZ();
+            Location loc = new Location(world, x, y, z);
+            e.setRespawnLocation(loc);
+        } else {
+            e.setRespawnLocation(p.getBedSpawnLocation());
+        }
     }
 
     @EventHandler
@@ -72,8 +85,8 @@ public class HunterCompass implements Listener {
             //Checking if left or right-clicked
             if (e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
                 //On left click, basically change which speedrunner is being tracked.
-                if (main.compassSelection.isEmpty()) {
-                    p.sendMessage(ChatColor.RED + "There are no hunters!");
+                if (main.speedrunners.isEmpty()) {
+                    p.sendMessage(ChatColor.GOLD + "There are no speedrunners!");
                 } else {
                     if (main.compassSelection.get(p) == main.speedrunners.size()-1) {
                         main.compassSelection.replace(p, 0);
@@ -87,23 +100,27 @@ public class HunterCompass implements Listener {
                 if (main.speedrunners.isEmpty()) {
                     p.sendMessage(ChatColor.RED + "There are no speedrunners for you to track.");
                 } else {
-                    Player speedrunner = (Player) main.speedrunners.keySet().toArray()[main.compassSelection.get(p)];
-                    //A cooldown
-                    if(!cooldown.asMap().containsKey(p)) {
-                        cooldown.put(p, System.currentTimeMillis() + (compassCooldown*1000));
-                        //Testing to see if the speedrunner is in a different plane of existence (aka the nether or the end)
-                        if(p.getWorld().getEnvironment() != speedrunner.getWorld().getEnvironment()) {
-                            p.sendMessage(ChatColor.RED + "The speedrunner is in a different dimension");
+                    if (main.speedrunners.keySet().toArray()[main.compassSelection.get(p)] != null) {
+                        Player speedrunner = (Player) main.speedrunners.keySet().toArray()[main.compassSelection.get(p)];
+                        //A cooldown
+                        if(!cooldown.asMap().containsKey(p)) {
+                            cooldown.put(p, System.currentTimeMillis() + (compassCooldown*1000));
+                            //Testing to see if the speedrunner is in a different plane of existence (aka the nether or the end)
+                            if(p.getWorld().getEnvironment() != speedrunner.getWorld().getEnvironment()) {
+                                p.sendMessage(ChatColor.RED + "The speedrunner is in a different dimension");
+                            } else {
+                                //Setting the compass to point towards the player
+                                compassMeta.setLodestoneTracked(false);
+                                compassMeta.setLodestone(main.speedrunners.get(main.speedrunners.keySet().toArray()[main.compassSelection.get(p)]));
+                                compass.setItemMeta(compassMeta);
+                                p.sendMessage(ChatColor.GREEN + "You've tracked " + speedrunner.getName() + "!");
+                            }
                         } else {
-                            //Setting the compass to point towards the player
-                            compassMeta.setLodestoneTracked(false);
-                            compassMeta.setLodestone(main.speedrunners.get(main.speedrunners.keySet().toArray()[main.compassSelection.get(p)]));
-                            compass.setItemMeta(compassMeta);
-                            p.sendMessage(ChatColor.GREEN + "You've tracked " + speedrunner.getName() + "!");
+                            long distance = cooldown.asMap().get(p) - System.currentTimeMillis();
+                            p.sendMessage(ChatColor.RED + "You must wait " + TimeUnit.MILLISECONDS.toSeconds(distance) + " seconds before you can track " + speedrunner.getName() + " again.");
                         }
                     } else {
-                        long distance = cooldown.asMap().get(p) - System.currentTimeMillis();
-                        p.sendMessage(ChatColor.RED + "You must wait " + TimeUnit.MILLISECONDS.toSeconds(distance) + " seconds before you can track " + speedrunner.getName() + " again.");
+                        p.sendMessage(ChatColor.RED + "That player is no longer a speedrunner!");
                     }
                 }
             }
