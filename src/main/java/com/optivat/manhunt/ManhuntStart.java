@@ -79,7 +79,10 @@ public class ManhuntStart implements Listener {
             e.getPlayer().sendTitle(ChatColor.RED + "NO BREAKING", ChatColor.DARK_RED + "until the manhunt starts.", 10, 20, 10);
         }
     }
-
+    
+    //Not related at all to the start of the manhunt, however, we know that the chance of getting enderperals is the chances
+    //of me getting a girlfriend so I think I should give the people an option to have increased pearl chances.
+    
     @EventHandler
     public void onBarter(PiglinBarterEvent e) {
         Random random = new Random();
