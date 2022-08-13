@@ -29,7 +29,7 @@ public class HunterCompass implements Listener {
         /*When someone who hasn't been assigned speedrunner or hunter (basically joining the server for the first time while it is running
          it will automatically assign them to the hunter team and will give them a compass.)
          */
-        if (!(main.speedrunners.containsKey(e.getPlayer()) && main.compassSelection.containsKey(e.getPlayer()))) {
+        if (!main.speedrunners.containsKey(e.getPlayer()) && !main.compassSelection.containsKey(e.getPlayer())) {
             main.compassSelection.put(e.getPlayer(), 0);
             giveHunterCompass(e.getPlayer());
         }
@@ -56,21 +56,22 @@ public class HunterCompass implements Listener {
         }
     }
 
-    @EventHandler
-    public void onLeave(PlayerQuitEvent e) {
-        Player p = e.getPlayer();
-        if (main.compassSelection.containsKey(p)) {
-            main.compassSelection.remove(p);
-        } else if(main.speedrunners.containsKey(p)) {
-            main.speedrunners.remove(p);
-        }
-    }
+//    @EventHandler
+//    public void onLeave(PlayerQuitEvent e) {
+//        Player p = e.getPlayer();
+//        if (main.compassSelection.containsKey(p)) {
+//            main.compassSelection.remove(p);
+//        }
+//        if(main.speedrunners.containsKey(p)) {
+//            main.speedrunners.remove(p);
+//        }
+//    }
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         if(main.speedrunners.containsKey(e.getPlayer())) {
             main.speedrunners.replace(e.getPlayer(), e.getPlayer().getLocation());
         }
-        if(!(main.speedrunners.containsKey(e.getPlayer()) && main.compassSelection.containsKey(e.getPlayer()))) {
+        if(!main.speedrunners.containsKey(e.getPlayer()) && !main.compassSelection.containsKey(e.getPlayer())) {
             main.compassSelection.put(e.getPlayer(), 0);
         }
     }

@@ -34,7 +34,6 @@ public class ManhuntEnd implements Listener {
             if(main.speedrunners.isEmpty()) {
                 Bukkit.broadcastMessage(ChatColor.GREEN + "" + e.getEntity().getName() + " has died, hunter(s) win!");
                 worldRestart();
-
             } else {
                 Bukkit.broadcastMessage(ChatColor.GREEN + "" + e.getEntity().getName() + " has died! " + main.speedrunners.size() + " still remains!");
             }
@@ -63,16 +62,14 @@ public class ManhuntEnd implements Listener {
             World netherWorld = server.getWorld("Manhunt" + main.worldnumber + "_nether");
             World overworldWorld = server.getWorld("Manhunt" + main.worldnumber);
 
-            if (e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL) {
-                e.setCanCreatePortal(true);
-                Location location;
-                if (p.getWorld() == overworldWorld) {
-                    location = new Location(netherWorld, e.getFrom().getBlockX() / 8, e.getFrom().getBlockY(), e.getFrom().getBlockZ() / 8);
-                } else {
-                    location = new Location(overworldWorld, e.getFrom().getBlockX() * 8, e.getFrom().getBlockY(), e.getFrom().getBlockZ() * 8);
-                }
-                e.setTo(location);
+            e.setCanCreatePortal(true);
+            Location location;
+            if (p.getWorld() == overworldWorld) {
+                location = new Location(netherWorld, e.getFrom().getBlockX() / 8, e.getFrom().getBlockY(), e.getFrom().getBlockZ() / 8);
+            } else {
+                location = new Location(overworldWorld, e.getFrom().getBlockX() * 8, e.getFrom().getBlockY(), e.getFrom().getBlockZ() * 8);
             }
+            e.setTo(location);
         }
         if (e.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL) {
             if(!Bukkit.getWorlds().contains(server.getWorld("Manhunt" + main.worldnumber + "_the_end"))) {

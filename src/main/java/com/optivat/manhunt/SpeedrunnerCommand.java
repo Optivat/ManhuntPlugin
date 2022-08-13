@@ -23,12 +23,16 @@ public boolean onCommand(CommandSender sender, Command command, String label, St
             switch (args[0]) {
                 case "add":
                     if(Bukkit.getPlayer(args[1]) != null) {
-                        main.speedrunners.put(Bukkit.getPlayer(args[1]), Bukkit.getPlayer(args[1]).getLocation());
-                        p.sendMessage(ChatColor.GREEN + args[1] + " is now a speedrunner!");
-                        //Removing the compass since they are no longer a hunter
-                        main.compassSelection.remove(Bukkit.getPlayer(args[1]));
-                        if(Bukkit.getPlayer(args[1]).getInventory().contains(Material.COMPASS)) {
-                            Bukkit.getPlayer(args[1]).getInventory().remove(Material.COMPASS);
+                        if (!main.speedrunners.containsKey(Bukkit.getPlayer(args[1]))) {
+                            main.speedrunners.put(Bukkit.getPlayer(args[1]), Bukkit.getPlayer(args[1]).getLocation());
+                            p.sendMessage(ChatColor.GREEN + args[1] + " is now a speedrunner!");
+                            //Removing the compass since they are no longer a hunter
+                            main.compassSelection.remove(Bukkit.getPlayer(args[1]));
+                            if(Bukkit.getPlayer(args[1]).getInventory().contains(Material.COMPASS)) {
+                                Bukkit.getPlayer(args[1]).getInventory().remove(Material.COMPASS);
+                            }
+                        } else {
+                            p.sendMessage(ChatColor.DARK_RED + args[1] + " is already a speedrunner!");
                         }
                     } else {
                         p.sendMessage(ChatColor.DARK_RED + "Player isn't online or doesn't exist.");
@@ -36,11 +40,15 @@ public boolean onCommand(CommandSender sender, Command command, String label, St
                     break;
                 case "remove":
                     if(Bukkit.getPlayer(args[1]) != null) {
-                        main.speedrunners.remove(Bukkit.getPlayer(args[1]));
-                        p.sendMessage(ChatColor.GREEN + args[1] + " is no longer a speedrunner!");
-                        //Giving the compass since they are now a hunter
-                        main.compassSelection.put(Bukkit.getPlayer(args[1]), 0);
-                        HunterCompass.giveHunterCompass(Bukkit.getPlayer(args[1]));
+                        if (main.speedrunners.containsKey(Bukkit.getPlayer(args[1]))) {
+                            main.speedrunners.remove(Bukkit.getPlayer(args[1]));
+                            p.sendMessage(ChatColor.GREEN + args[1] + " is no longer a speedrunner!");
+                            //Giving the compass since they are now a hunter
+                            main.compassSelection.put(Bukkit.getPlayer(args[1]), 0);
+                            HunterCompass.giveHunterCompass(Bukkit.getPlayer(args[1]));
+                        } else {
+                            p.sendMessage(ChatColor.DARK_RED + args[1] + " is already a hunter!");
+                        }
                     } else {
                         p.sendMessage(ChatColor.DARK_RED + "Player isn't online or doesn't exist.");
                     }

@@ -60,7 +60,7 @@ public class ManhuntStart implements Listener {
         double z = spawn.getZ();
         Location loc = new Location(world, x, y, z);
         p.teleport(loc);
-        if (main.manhuntStart == false) {
+        if (!main.manhuntStart) {
             e.getPlayer().setGameMode(GameMode.SURVIVAL);
         }
     }
@@ -115,10 +115,10 @@ public class ManhuntStart implements Listener {
                 }
                 e.setCancelled(true);
             }
-            if (main.teamchattoggle.contains(p)) {
+            if (main.speedrunners.containsKey(p)) {
                 for (Player all : Bukkit.getOnlinePlayers()) {
-                    if (main.teamchattoggle.contains(all)) {
-                        all.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e[SPEEDRUNNER] " + e.getPlayer().getName() + " &6&l>&7 " + e.getMessage()));;
+                    if (main.speedrunners.containsKey(all)) {
+                        all.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e[SPEEDRUNNER] " + e.getPlayer().getName() + " &6&l>&7 " + e.getMessage()));
                     }
                 }
                 e.setCancelled(true);
