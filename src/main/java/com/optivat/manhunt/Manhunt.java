@@ -30,22 +30,20 @@ public final class Manhunt extends JavaPlugin {
         getCommand("teamchattoggle").setExecutor(new TeamChatToggle(this));
         getCommand("manhunt").setExecutor(new ManhuntStartCommand(this));
 
-        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&a[MANHUNT] Please consider reviewing the plugin!"));
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&a[Manhunt] Please consider reviewing the plugin!"));
 
         //If this is the first time the plugin is initiallized it means that the Manhunt world isn't created, so that is what is going to happen.
-        if(Bukkit.getWorld("Manhunt"+ getConfig().getInt("number_worlds")) == null) {
-            worldnumber = worldnumber+1;
-            WorldCreator.name("Manhunt"+ worldnumber).createWorld();
 
-            WorldCreator wc = new WorldCreator("Manhunt" + worldnumber + "_nether");
-            wc.environment(World.Environment.NETHER);
-            wc.createWorld();
+        Bukkit.getConsoleSender().sendMessage(ChatColor.translateAlternateColorCodes('&', "&c[Manhunt] Loading world..."));
+        WorldCreator.name("Manhunt"+ worldnumber).createWorld();
 
-            WorldCreator wc1 = new WorldCreator("Manhunt" + worldnumber + "_the_end");
-            wc1.environment(World.Environment.THE_END);
-            wc1.createWorld();
-        }
+        WorldCreator wc = new WorldCreator("Manhunt" + worldnumber + "_nether");
+        wc.environment(World.Environment.NETHER);
+        wc.createWorld();
 
+        WorldCreator wc1 = new WorldCreator("Manhunt" + worldnumber + "_the_end");
+        wc1.environment(World.Environment.THE_END);
+        wc1.createWorld();
     }
 
     @Override

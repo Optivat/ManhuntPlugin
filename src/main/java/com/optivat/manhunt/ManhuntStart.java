@@ -54,14 +54,18 @@ public class ManhuntStart implements Listener {
         Player p = e.getPlayer();
         Server server = p.getServer();
         World world = server.getWorld("Manhunt" + main.worldnumber);
-        Location spawn = world.getSpawnLocation();
-        double x = spawn.getX();
-        double y = spawn.getY();
-        double z = spawn.getZ();
-        Location loc = new Location(world, x, y, z);
-        p.teleport(loc);
-        if (!main.manhuntStart) {
-            e.getPlayer().setGameMode(GameMode.SURVIVAL);
+        if (main.speedrunners.containsKey(p) || main.compassSelection.containsKey(p)) {
+
+        } else {
+            Location spawn = world.getSpawnLocation();
+            double x = spawn.getX();
+            double y = spawn.getY();
+            double z = spawn.getZ();
+            Location loc = new Location(world, x, y, z);
+            p.teleport(loc);
+            if (!main.manhuntStart) {
+                e.getPlayer().setGameMode(GameMode.SURVIVAL);
+            }
         }
     }
 
