@@ -27,8 +27,7 @@ public class ManhuntStart implements Listener {
     @EventHandler
     public void onMove(PlayerMoveEvent e) {
         if(!main.manhuntStart) {
-            e.setCancelled(true);
-            e.getPlayer().sendTitle(ChatColor.RED + "NO MOVING", ChatColor.DARK_RED + "until the manhunt starts.", 10, 20, 10);
+            e.getPlayer().sendTitle(ChatColor.RED + "Manhunt", ChatColor.DARK_RED + "hasn't started yet.", 10, 20, 10);
             if(!(main.speedrunners.containsKey(e.getPlayer()) && main.compassSelection.containsKey(e.getPlayer()))) {
                 main.compassSelection.put(e.getPlayer(), 0);
             }
@@ -43,9 +42,7 @@ public class ManhuntStart implements Listener {
             if (e.getFrom().getX() != e.getTo().getX() || e.getFrom().getY() != e.getTo().getY() || e.getFrom().getZ() != e.getTo().getZ()) {
                 Location loc = e.getFrom();
                 e.getPlayer().teleport(loc.setDirection(e.getTo().getDirection()));
-                return;
             }
-            e.setCancelled(true);
         }
     }
 
@@ -55,18 +52,26 @@ public class ManhuntStart implements Listener {
         Server server = p.getServer();
         World world = server.getWorld("Manhunt" + main.worldnumber);
         if (main.speedrunners.containsKey(p) || main.compassSelection.containsKey(p)) {
-
+            if(!e.getPlayer().getWorld().getName().contains(String.valueOf(main.worldnumber))) {
+                e.getPlayer().sendMessage("Transporting...");
+                teleportWorld(p, world);
+            }
         } else {
-            Location spawn = world.getSpawnLocation();
-            double x = spawn.getX();
-            double y = spawn.getY();
-            double z = spawn.getZ();
-            Location loc = new Location(world, x, y, z);
-            p.teleport(loc);
+            teleportWorld(p, world);
             if (!main.manhuntStart) {
                 e.getPlayer().setGameMode(GameMode.SURVIVAL);
             }
         }
+    }
+
+    private void teleportWorld(Player p, World world) {
+        Location spawn = world.getSpawnLocation();
+        Random rand = new Random();
+        double x = spawn.getX() + (rand.nextDouble()*5);
+        double y = spawn.getY();
+        double z = spawn.getZ() + (rand.nextDouble()*5);
+        Location loc = new Location(world, x, y, z);
+        p.teleport(loc);
     }
 
     @EventHandler

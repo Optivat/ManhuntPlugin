@@ -51,9 +51,12 @@ public class HunterCompass implements Listener {
             double z = spawn.getZ();
             Location loc = new Location(world, x, y, z);
             e.setRespawnLocation(loc);
+            p.teleport(loc);
         } else {
             e.setRespawnLocation(p.getBedSpawnLocation());
+            p.teleport(e.getRespawnLocation());
         }
+
     }
 
 //    @EventHandler

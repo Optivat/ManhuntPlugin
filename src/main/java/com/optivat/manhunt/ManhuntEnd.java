@@ -115,6 +115,8 @@ public class ManhuntEnd implements Listener {
                 all.getInventory().clear();
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "advancement revoke " + all.getName() + " everything");
                 all.kickPlayer("World is restarting, please wait at least 20 seconds before rejoining.");
+                main.speedrunners.remove(all);
+                main.compassSelection.remove(all);
             }
             World world = Bukkit.getWorld("Manhunt"+ main.worldnumber);
             world.setKeepSpawnInMemory(false);
